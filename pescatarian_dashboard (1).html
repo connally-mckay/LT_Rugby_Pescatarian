@@ -1,0 +1,1527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LT Rugby Pescatarian Nutrition Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: #fff;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+            padding: 2rem;
+            text-align: center;
+            border-bottom: 3px solid #4a90e2;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            color: #4a90e2;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .header .subtitle {
+            font-size: 1.2rem;
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .header p {
+            font-size: 1rem;
+            color: #ddd;
+            margin-top: 0.5rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            padding: 1rem 1.5rem;
+            font-size: 1rem;
+            font-weight: bold;
+            border: 2px solid #4a90e2;
+            background: #000000;
+            color: #fff;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        .nav-btn:hover {
+            background: #4a90e2;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(74, 144, 226, 0.4);
+        }
+
+        .nav-btn.active {
+            background: #4a90e2;
+            border-color: #fff;
+            box-shadow: 0 6px 12px rgba(74, 144, 226, 0.6);
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .card {
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid rgba(74, 144, 226, 0.3);
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(74, 144, 226, 0.3);
+            border-color: rgba(74, 144, 226, 0.6);
+        }
+
+        .card h2 {
+            color: #4a90e2;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+            border-bottom: 2px solid rgba(74, 144, 226, 0.5);
+            padding-bottom: 0.5rem;
+        }
+
+        .card h3 {
+            color: #ffffff;
+            margin: 1rem 0 0.5rem 0;
+            font-size: 1.2rem;
+        }
+
+        .fish-tier {
+            background: rgba(10, 10, 10, 0.7);
+            padding: 1rem;
+            margin: 0.5rem 0;
+            border-radius: 8px;
+            border-left: 4px solid #27ae60;
+        }
+
+        .fish-tier.tier-2 {
+            border-left-color: #f39c12;
+        }
+
+        .fish-tier.tier-3 {
+            border-left-color: #e74c3c;
+        }
+
+        .fish-tier.avoid {
+            border-left-color: #c0392b;
+            background: rgba(231, 76, 60, 0.1);
+        }
+
+        .fish-tier h4 {
+            color: #4a90e2;
+            margin-bottom: 0.5rem;
+        }
+
+        .fish-item {
+            margin: 0.75rem 0;
+            padding: 0.75rem;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 5px;
+        }
+
+        .fish-name {
+            font-weight: bold;
+            color: #4a90e2;
+            font-size: 1.1rem;
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        .fish-detail {
+            display: flex;
+            align-items: center;
+            margin: 0.25rem 0;
+            font-size: 0.9rem;
+        }
+
+        .fish-detail strong {
+            color: #27ae60;
+            min-width: 100px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin: 0.25rem 0.25rem 0.25rem 0;
+        }
+
+        .badge-best { background: #27ae60; }
+        .badge-good { background: #f39c12; }
+        .badge-occasional { background: #e67e22; }
+        .badge-avoid { background: #e74c3c; }
+        .badge-mercury-low { background: #27ae60; }
+        .badge-mercury-moderate { background: #f39c12; }
+        .badge-mercury-high { background: #e74c3c; }
+
+        .meal-plan {
+            background: rgba(10, 10, 10, 0.7);
+            padding: 1rem;
+            margin: 0.5rem 0;
+            border-radius: 8px;
+            border-left: 4px solid #4a90e2;
+        }
+
+        .meal-plan h4 {
+            color: #4a90e2;
+            margin-bottom: 0.5rem;
+        }
+
+        .meal-section {
+            margin: 1rem 0;
+            padding: 0.75rem;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 5px;
+        }
+
+        .meal-section h5 {
+            color: #27ae60;
+            margin-bottom: 0.5rem;
+        }
+
+        .meal-section ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .meal-section li {
+            padding: 0.25rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .meal-section li:before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: #4a90e2;
+        }
+
+        .calories {
+            display: inline-block;
+            background: #27ae60;
+            color: #fff;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        .protein {
+            display: inline-block;
+            background: #4a90e2;
+            color: #fff;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            margin-left: 0.5rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .stat-box {
+            background: rgba(10, 10, 10, 0.8);
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid rgba(74, 144, 226, 0.3);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #4a90e2;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #ddd;
+            margin-top: 0.25rem;
+        }
+
+        .tips-box {
+            background: linear-gradient(135deg, rgba(74, 144, 226, 0.2) 0%, rgba(20, 20, 20, 0.6) 100%);
+            border: 2px solid rgba(74, 144, 226, 0.5);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .tips-box h3 {
+            color: #4a90e2;
+            margin-bottom: 1rem;
+        }
+
+        .tips-box ul {
+            list-style: none;
+        }
+
+        .tips-box li {
+            padding: 0.5rem 0;
+            padding-left: 2rem;
+            position: relative;
+        }
+
+        .tips-box li:before {
+            content: "🐟";
+            position: absolute;
+            left: 0;
+            font-size: 1.2rem;
+        }
+
+        .warning-box {
+            background: rgba(231, 76, 60, 0.2);
+            border: 2px solid rgba(231, 76, 60, 0.5);
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
+        .warning-box h4 {
+            color: #e74c3c;
+            margin-bottom: 0.5rem;
+        }
+
+        .success-box {
+            background: rgba(39, 174, 96, 0.2);
+            border: 2px solid rgba(39, 174, 96, 0.5);
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
+        .success-box h4 {
+            color: #27ae60;
+            margin-bottom: 0.5rem;
+        }
+
+        .shopping-list {
+            background: rgba(10, 10, 10, 0.6);
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 0.5rem 0;
+        }
+
+        .shopping-list h4 {
+            color: #4a90e2;
+            margin-bottom: 0.5rem;
+        }
+
+        .shopping-list ul {
+            list-style: none;
+        }
+
+        .shopping-list li {
+            padding: 0.25rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .shopping-list li:before {
+            content: "☐";
+            position: absolute;
+            left: 0;
+            color: #4a90e2;
+            font-size: 1.2rem;
+        }
+
+        .price-tag {
+            color: #27ae60;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .section-content {
+            display: none;
+        }
+
+        .section-content.active {
+            display: block;
+        }
+
+        .alternative-list {
+            background: rgba(39, 174, 96, 0.1);
+            border: 2px solid rgba(39, 174, 96, 0.3);
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 0.5rem 0;
+        }
+
+        .alternative-list h4 {
+            color: #27ae60;
+            margin-bottom: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            .nav-btn {
+                padding: 0.75rem 1rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        .supplement-card {
+            background: rgba(20, 20, 20, 0.5);
+            border: 2px solid rgba(74, 144, 226, 0.3);
+            padding: 1rem;
+            margin: 0.5rem 0;
+            border-radius: 8px;
+        }
+
+        .supplement-card h4 {
+            color: #4a90e2;
+            margin-bottom: 0.5rem;
+        }
+
+        .tier-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .tier-1 { background: #27ae60; }
+        .tier-2 { background: #f39c12; }
+        .tier-3 { background: #3498db; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🐟 LAKE TRAVIS RUGBY - PESCATARIAN PROTOCOL</h1>
+        <p class="subtitle">Complete Fish-Based Performance Nutrition for Weight Gain</p>
+        <p>Built for Gwil and Any Pescatarian Rugby Player</p>
+    </div>
+
+    <div class="container">
+        <!-- Navigation Tabs -->
+        <div class="nav-tabs">
+            <button class="nav-btn active" onclick="switchSection('fish-quality')">🐟 Fish Quality</button>
+            <button class="nav-btn" onclick="switchSection('alternatives')">🥛 Alternatives</button>
+            <button class="nav-btn" onclick="switchSection('meal-plans')">🍽️ Meal Plans</button>
+            <button class="nav-btn" onclick="switchSection('supplements')">💊 Supplements</button>
+            <button class="nav-btn" onclick="switchSection('shopping')">🛒 Shopping</button>
+        </div>
+
+        <!-- Fish Quality Section -->
+        <div id="fish-quality" class="section-content active">
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <span class="stat-number">3500-4000</span>
+                    <span class="stat-label">Daily Calories</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-number">180-200g</span>
+                    <span class="stat-label">Protein/Day</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-number">0.5-1 lb</span>
+                    <span class="stat-label">Weekly Gain</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-number">2-3x</span>
+                    <span class="stat-label">Omega-3 Advantage</span>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h2>🌟 TIER 1: BEST FISH (Eat Frequently)</h2>
+                    <p style="color: #27ae60; font-weight: bold; margin-bottom: 1rem;">Build Your Diet Around These</p>
+                    
+                    <div class="fish-item">
+                        <span class="fish-name">Wild-Caught Alaska Salmon</span>
+                        <span class="badge badge-best">BEST</span>
+                        <span class="badge badge-mercury-low">Mercury: Very Low</span>
+                        <div class="fish-detail"><strong>Why:</strong> Highest omega-3, cleanest waters, sustainable</div>
+                        <div class="fish-detail"><strong>Frequency:</strong> 3-4x/week</div>
+                        <div class="fish-detail"><strong>Cost:</strong> $10-15/lb frozen (Costco, Trader Joe's)</div>
+                        <div class="fish-detail"><strong>Note:</strong> "Alaskan" = wild, "Atlantic" = farmed (avoid)</div>
+                    </div>
+
+                    <div class="fish-item">
+                        <span class="fish-name">Sardines (Wild-Caught)</span>
+                        <span class="badge badge-best">BEST</span>
+                        <span class="badge badge-mercury-low">Mercury: Extremely Low</span>
+                        <div class="fish-detail"><strong>Why:</strong> Highest omega-3 per dollar, super clean, convenient</div>
+                        <div class="fish-detail"><strong>Frequency:</strong> Daily if you can</div>
+                        <div class="fish-detail"><strong>Cost:</strong> $2-4/can</div>
+                        <div class="fish-detail"><strong>Brands:</strong> Wild Planet, King Oscar, Season</div>
+                    </div>
+
+                    <div class="fish-item">
+                        <span class="fish-name">Atlantic/Pacific Mackerel</span>
+                        <span class="badge badge-best">BEST</span>
+                        <span class="badge badge-mercury-low">Mercury: Low</span>
+                        <div class="fish-detail"><strong>Why:</strong> High omega-3, affordable, underrated</div>
+                        <div class="fish-detail"><strong>Frequency:</strong> 2-3x/week</div>
+                        <div class="fish-detail"><strong>Cost:</strong> $3-5/can or $8/lb fresh</div>
+                        <div class="fish-detail"><strong>WARNING:</strong> King Mackerel has HIGH mercury - avoid</div>
+                    </div>
+
+                    <div class="fish-item">
+                        <span class="fish-name">Anchovies</span>
+                        <span class="badge badge-best">BEST</span>
+                        <span class="badge badge-mercury-low">Mercury: Essentially Zero</span>
+                        <div class="fish-detail"><strong>Why:</strong> Cleanest fish on planet, omega-3 bombs</div>
+                        <div class="fish-detail"><strong>Frequency:</strong> Daily if you can</div>
+                        <div class="fish-detail"><strong>Cost:</strong> $3-4/can</div>
+                    </div>
+
+                    <div class="fish-item">
+                        <span class="fish-name">Wild-Caught Cod/Haddock</span>
+                        <span class="badge badge-best">BEST</span>
+                        <span class="badge badge-mercury-low">Mercury: Low</span>
+                        <div class="fish-detail"><strong>Why:</strong> Lean, clean, sustainable</div>
+                        <div class="fish-detail"><strong>Frequency:</strong> 3-4x/week</div>
+                        <div class="fish-detail"><strong>Cost:</strong> $10-12/lb</div>
+                    </div>
+
+                    <div class="fish-item">
+                        <span class="fish-name">Rainbow Trout (US Farmed)</span>
+                        <span class="badge badge-best">BEST</span>
+                        <span class="badge badge-mercury-low">Mercury: Low</span>
+                        <div class="fish-detail"><strong>Why:</strong> ONE OF FEW farmed fish worth eating</div>
+                        <div class="fish-detail"><strong>Frequency:</strong> 2-3x/week</div>
+                        <div class="fish-detail"><strong>Cost:</strong> $8-12/lb</div>
+                        <div class="fish-detail"><strong>Note:</strong> US farmed specifically, not imported</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>⚡ TIER 2: GOOD FISH (1-2x/Week)</h2>
+                    
+                    <div class="fish-item">
+                        <span class="fish-name">Wild Skipjack Tuna (Light Tuna)</span>
+                        <span class="badge badge-good">GOOD</span>
+                        <span class="badge badge-mercury-moderate">Mercury: Moderate</span>
+                        <div class="fish-detail"><strong>Why:</strong> High protein, convenient canned</div>
+                        <div class="fish-detail"><strong>Frequency:</strong> 1-2x/week MAX</div>
+                        <div class="fish-detail"><strong>Cost:</strong> $2-3/can</div>
+                        <div class="fish-detail"><strong>CRITICAL:</strong> Skipjack has 3x LESS mercury than albacore</div>
+                        <div class="fish-detail"><strong>Brands:</strong> Wild Planet, Safe Catch</div>
+                    </div>
+
+                    <div class="fish-item">
+                        <span class="fish-name">Wild Shrimp (US/Canada/MSC)</span>
+                        <span class="badge badge-good">GOOD</span>
+                        <span class="badge badge-mercury-low">Mercury: Very Low</span>
+                        <div class="fish-detail"><strong>Why:</strong> High protein, lean, versatile</div>
+                        <div class="fish-detail"><strong>Frequency:</strong> 2-3x/week</div>
+                        <div class="fish-detail"><strong>Cost:</strong> $10-15/lb frozen</div>
+                        <div class="fish-detail"><strong>WARNING:</strong> Most shrimp is farmed badly - look for wild</div>
+                    </div>
+
+                    <div class="fish-item">
+                        <span class="fish-name">Mussels/Clams/Oysters</span>
+                        <span class="badge badge-good">GOOD</span>
+                        <span class="badge badge-mercury-low">Mercury: Very Low</span>
+                        <div class="fish-detail"><strong>Why:</strong> Sustainable, high nutrients, clean</div>
+                        <div class="fish-detail"><strong>Frequency:</strong> 2-3x/week</div>
+                        <div class="fish-detail"><strong>Cost:</strong> $5-10/lb</div>
+                        <div class="fish-detail"><strong>Bonus:</strong> Farmed shellfish CLEAN water - farmed is ethical</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>⚠️ TIER 3: OCCASIONAL ONLY</h2>
+                    
+                    <div class="fish-tier tier-3">
+                        <h4>Albacore/White Tuna</h4>
+                        <span class="badge badge-mercury-high">Mercury: HIGH</span>
+                        <p><strong>Max Frequency:</strong> 1x/month</p>
+                        <p>If you love tuna, stick to skipjack/light tuna instead</p>
+                    </div>
+
+                    <div class="fish-tier tier-3">
+                        <h4>Swordfish</h4>
+                        <span class="badge badge-mercury-high">Mercury: VERY HIGH</span>
+                        <p><strong>Max Frequency:</strong> Avoid or 1x every few months</p>
+                        <p>Big predator fish = mercury bomb</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>🚫 AVOID COMPLETELY</h2>
+                    
+                    <div class="fish-tier avoid">
+                        <h4>Farmed Atlantic Salmon</h4>
+                        <span class="badge badge-avoid">AVOID</span>
+                        <p><strong>Why:</strong> Fed junk, high contaminants, poor omega-3 ratio, destructive farming</p>
+                        <p><strong>How to spot:</strong> If it says "salmon" or "Atlantic salmon" = farmed</p>
+                    </div>
+
+                    <div class="fish-tier avoid">
+                        <h4>Imported Farmed Shrimp (especially Asia)</h4>
+                        <span class="badge badge-avoid">AVOID</span>
+                        <p><strong>Why:</strong> Terrible practices, antibiotics, chemicals, slave labor concerns</p>
+                    </div>
+
+                    <div class="fish-tier avoid">
+                        <h4>Tilapia (especially imported)</h4>
+                        <span class="badge badge-avoid">AVOID</span>
+                        <p><strong>Why:</strong> Poor omega-3 to omega-6 ratio, basically filler protein</p>
+                    </div>
+
+                    <div class="fish-tier avoid">
+                        <h4>King Mackerel, Shark, Tilefish, Marlin</h4>
+                        <span class="badge badge-avoid">AVOID</span>
+                        <span class="badge badge-mercury-high">Mercury: EXTREMELY HIGH</span>
+                        <p><strong>Why:</strong> Just don't. Mercury bombs.</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>🎯 WHEN TO SKIP FISH</h2>
+                    
+                    <div class="warning-box">
+                        <h4>Red Flags:</h4>
+                        <ul style="list-style: none;">
+                            <li>✗ Smells "fishy" or ammonia-like (should smell like ocean)</li>
+                            <li>✗ Eyes are cloudy (whole fish - fresh = clear eyes)</li>
+                            <li>✗ Flesh is mushy or discolored</li>
+                            <li>✗ Sketchy restaurant kitchen</li>
+                            <li>✗ Suspiciously cheap ($5.99/lb "salmon" = fraud)</li>
+                            <li>✗ No wild/farmed label (they're hiding something)</li>
+                            <li>✗ Already had tuna twice this week (mercury adds up)</li>
+                        </ul>
+                    </div>
+
+                    <div class="tips-box">
+                        <h3>💡 The Mercury Rule</h3>
+                        <ul>
+                            <li>Small fish (sardines, anchovies, mackerel) = almost no mercury</li>
+                            <li>Medium fish (salmon, cod, trout) = low mercury</li>
+                            <li>Big predator fish (tuna, swordfish) = mercury bombs</li>
+                            <li>Mercury bioaccumulates up the food chain</li>
+                            <li>For rugby: You need your brain and nervous system sharp</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>🛍️ WHERE TO BUY QUALITY FISH</h2>
+                    
+                    <div class="shopping-list">
+                        <h4>Best Places (Budget-Conscious):</h4>
+                        <ul>
+                            <li><strong>Costco:</strong> Wild salmon frozen $10-12/lb, flash-frozen at sea</li>
+                            <li><strong>Trader Joe's:</strong> Wild salmon, sardines, mackerel - good prices</li>
+                            <li><strong>Whole Foods/Central Market:</strong> Expensive but quality guaranteed</li>
+                            <li><strong>Asian Markets (H Mart, 99 Ranch):</strong> Fresh whole fish, often cheaper</li>
+                            <li><strong>Canned Fish (Any Store):</strong> Wild Planet, Season, Safe Catch, King Oscar</li>
+                        </ul>
+                    </div>
+
+                    <div class="tips-box">
+                        <h3>💰 Budget Hack</h3>
+                        <ul>
+                            <li>Canned fish often BETTER quality than "fresh" at regular stores</li>
+                            <li>Frozen at sea = peak freshness</li>
+                            <li>A can of sardines ($3.99) = 20g protein + high omega-3s</li>
+                            <li>Cheaper per pound than fresh</li>
+                            <li>Long shelf life = stock up</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alternatives Section -->
+        <div id="alternatives" class="section-content">
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h2>🥛 DAIRY PROTEINS (Main Backup)</h2>
+                    <p style="color: #27ae60; font-weight: bold; margin-bottom: 1rem;">Your Best Friends When Fish Isn't Available</p>
+                    
+                    <div class="alternative-list">
+                        <h4>Greek Yogurt (Full-Fat)</h4>
+                        <p><strong>Protein:</strong> 15-20g per cup</p>
+                        <p><strong>Use:</strong> Breakfast, snacks, evening</p>
+                        <p><strong>Brands:</strong> Fage, Siggi's, Chobani (plain, add your own fruit)</p>
+                    </div>
+
+                    <div class="alternative-list">
+                        <h4>Cottage Cheese (Full-Fat)</h4>
+                        <p><strong>Protein:</strong> 25g per cup</p>
+                        <p><strong>Use:</strong> Snacks, before bed (slow-digesting casein)</p>
+                        <p><strong>Tip:</strong> Mix with fruit, nuts, honey</p>
+                    </div>
+
+                    <div class="alternative-list">
+                        <h4>Kefir</h4>
+                        <p><strong>Protein:</strong> 10-15g per cup</p>
+                        <p><strong>Bonus:</strong> Probiotics for gut health</p>
+                        <p><strong>Use:</strong> Smoothies, drink straight, breakfast</p>
+                    </div>
+
+                    <div class="alternative-list">
+                        <h4>Whole Milk</h4>
+                        <p><strong>Protein:</strong> 8g per cup</p>
+                        <p><strong>Use:</strong> All day, with meals, in shakes</p>
+                        <p><strong>Best:</strong> Grass-fed if budget allows</p>
+                    </div>
+
+                    <div class="alternative-list">
+                        <h4>Cheese</h4>
+                        <p><strong>Protein:</strong> 7g per oz</p>
+                        <p><strong>Types:</strong> Cheddar, mozzarella, goat cheese, feta</p>
+                        <p><strong>Use:</strong> On everything</p>
+                    </div>
+
+                    <div class="alternative-list">
+                        <h4>Whey Protein Powder</h4>
+                        <p><strong>Protein:</strong> 25g per scoop</p>
+                        <p><strong>Use:</strong> Post-workout, between meals</p>
+                        <p><strong>Note:</strong> Critical for weight gain</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>🌱 LEGUMES (Secondary Backup)</h2>
+                    
+                    <div class="alternative-list">
+                        <h4>Lentils</h4>
+                        <p><strong>Protein:</strong> 18g per cup cooked</p>
+                        <p><strong>Use:</strong> Soups, curries, bowls</p>
+                        <p><strong>Bonus:</strong> High fiber, iron, cheap as hell</p>
+                    </div>
+
+                    <div class="alternative-list">
+                        <h4>Chickpeas</h4>
+                        <p><strong>Protein:</strong> 15g per cup</p>
+                        <p><strong>Use:</strong> Hummus, roasted snacks, curries, salads</p>
+                    </div>
+
+                    <div class="alternative-list">
+                        <h4>Black Beans</h4>
+                        <p><strong>Protein:</strong> 15g per cup</p>
+                        <p><strong>Use:</strong> Bowls, burritos, side dishes</p>
+                    </div>
+
+                    <div class="alternative-list">
+                        <h4>Edamame</h4>
+                        <p><strong>Protein:</strong> 18g per cup</p>
+                        <p><strong>Use:</strong> Snack, side dish, salads</p>
+                    </div>
+
+                    <div class="alternative-list">
+                        <h4>Tofu (if you'll eat soy)</h4>
+                        <p><strong>Protein:</strong> 20g per cup</p>
+                        <p><strong>Use:</strong> Stir-fries, scrambles, grilled</p>
+                        <p><strong>Note:</strong> Fermented soy (tempeh, miso) is better</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>🥚 EGGS (Push for These)</h2>
+                    
+                    <div class="alternative-list">
+                        <h4>Whole Eggs</h4>
+                        <p><strong>Protein:</strong> 6g per egg</p>
+                        <p><strong>Use:</strong> Breakfast, anytime</p>
+                        <p><strong>Note:</strong> Whole eggs > egg whites (yolk has nutrients)</p>
+                    </div>
+
+                    <div class="tips-box">
+                        <h3>💡 Worth Pushing On Eggs</h3>
+                        <ul>
+                            <li>Even if he says he "doesn't like eggs," try different styles</li>
+                            <li>Scrambled with cheese</li>
+                            <li>Hard-boiled with hot sauce</li>
+                            <li>In fried rice (won't taste them)</li>
+                            <li>Baked into things</li>
+                            <li>Eggs are one of the BEST pescatarian proteins</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>🥜 NUTS & NUT BUTTERS</h2>
+                    
+                    <div class="alternative-list">
+                        <h4>Almonds, Cashews, Walnuts</h4>
+                        <p><strong>Protein:</strong> 6-7g per oz</p>
+                        <p><strong>Bonus:</strong> Healthy fats, calories for weight gain</p>
+                    </div>
+
+                    <div class="alternative-list">
+                        <h4>Peanut Butter, Almond Butter</h4>
+                        <p><strong>Protein:</strong> 8g per 2 tbsp</p>
+                        <p><strong>Use:</strong> On everything - toast, smoothies, straight from jar</p>
+                        <p><strong>Get Natural:</strong> Ingredients = nuts, maybe salt</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Meal Plans Section -->
+        <div id="meal-plans" class="section-content">
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h2>🍽️ SAMPLE DAY 1 - SALMON FOCUS</h2>
+                    
+                    <div class="meal-section">
+                        <h5>BREAKFAST</h5>
+                        <ul>
+                            <li>4 eggs scrambled OR 2 cups Greek yogurt</li>
+                            <li>3 sourdough toast with grass-fed butter</li>
+                            <li>1 banana</li>
+                            <li>16oz whole milk or kefir</li>
+                        </ul>
+                        <span class="calories">~900 cal</span>
+                        <span class="protein">45g protein</span>
+                    </div>
+
+                    <div class="meal-section">
+                        <h5>MORNING SNACK</h5>
+                        <ul>
+                            <li>Can of sardines on sourdough toast OR</li>
+                            <li>Greek yogurt with granola and berries</li>
+                        </ul>
+                        <span class="calories">~300 cal</span>
+                        <span class="protein">15g protein</span>
+                    </div>
+
+                    <div class="meal-section">
+                        <h5>LUNCH</h5>
+                        <ul>
+                            <li>8oz wild salmon (grilled, baked, or canned)</li>
+                            <li>2 cups white rice with butter</li>
+                            <li>Large roasted vegetables</li>
+                            <li>Side salad with olive oil</li>
+                            <li>1 apple</li>
+                        </ul>
+                        <span class="calories">~900 cal</span>
+                        <span class="protein">50g protein</span>
+                    </div>
+
+                    <div class="meal-section">
+                        <h5>AFTERNOON SNACK</h5>
+                        <ul>
+                            <li>Protein shake: 2 scoops whey</li>
+                            <li>16oz whole milk</li>
+                            <li>2 tbsp peanut butter</li>
+                            <li>Banana</li>
+                        </ul>
+                        <span class="calories">~500 cal</span>
+                        <span class="protein">30g protein</span>
+                    </div>
+
+                    <div class="meal-section">
+                        <h5>DINNER</h5>
+                        <ul>
+                            <li>6oz grilled cod or halibut</li>
+                            <li>2 large baked potatoes with butter and cheese</li>
+                            <li>Roasted broccoli with olive oil</li>
+                            <li>1 whole avocado</li>
+                            <li>Glass of milk</li>
+                        </ul>
+                        <span class="calories">~1000 cal</span>
+                        <span class="protein">45g protein</span>
+                    </div>
+
+                    <div class="meal-section">
+                        <h5>EVENING SNACK</h5>
+                        <ul>
+                            <li>2 cups cottage cheese</li>
+                            <li>Mixed berries</li>
+                            <li>2 tbsp almond butter</li>
+                            <li>Drizzle honey</li>
+                        </ul>
+                        <span class="calories">~500 cal</span>
+                        <span class="protein">25g protein</span>
+                    </div>
+
+                    <div class="success-box">
+                        <h4>DAILY TOTALS:</h4>
+                        <p><strong>Calories:</strong> ~4100</p>
+                        <p><strong>Protein:</strong> 210g</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>🥫 SAMPLE DAY 2 - CANNED FISH BUDGET DAY</h2>
+                    
+                    <div class="meal-section">
+                        <h5>BREAKFAST</h5>
+                        <ul>
+                            <li>2 packs oatmeal + 2 scoops protein powder</li>
+                            <li>2 tbsp peanut butter stirred in</li>
+                            <li>Banana</li>
+                            <li>16oz kefir</li>
+                        </ul>
+                        <span class="calories">~850 cal</span>
+                        <span class="protein">40g protein</span>
+                    </div>
+
+                    <div class="meal-section">
+                        <h5>MORNING SNACK</h5>
+                        <ul>
+                            <li>2 cans sardines with hot sauce</li>
+                            <li>Crackers or sourdough toast</li>
+                        </ul>
+                        <span class="calories">~350 cal</span>
+                        <span class="protein">20g protein</span>
+                    </div>
+
+                    <div class="meal-section">
+                        <h5>LUNCH</h5>
+                        <ul>
+                            <li>2 cans skipjack tuna</li>
+                            <li>Make tuna salad with avocado mayo</li>
+                            <li>2 large sandwiches on sourdough</li>
+                            <li>Bag of chips</li>
+                            <li>Apple</li>
+                        </ul>
+                        <span class="calories">~900 cal</span>
+                        <span class="protein">45g protein</span>
+                    </div>
+
+                    <div class="meal-section">
+                        <h5>AFTERNOON SNACK</h5>
+                        <ul>
+                            <li>Protein shake</li>
+                        </ul>
+                        <span class="calories">~500 cal</span>
+                        <span class="protein">30g protein</span>
+                    </div>
+
+                    <div class="meal-section">
+                        <h5>DINNER</h5>
+                        <ul>
+                            <li>8oz wild shrimp stir-fry</li>
+                            <li>2 cups rice noodles</li>
+                            <li>Tons of vegetables</li>
+                            <li>Cooked in avocado oil</li>
+                            <li>Side of edamame</li>
+                        </ul>
+                        <span class="calories">~1000 cal</span>
+                        <span class="protein">50g protein</span>
+                    </div>
+
+                    <div class="meal-section">
+                        <h5>EVENING SNACK</h5>
+                        <ul>
+                            <li>Greek yogurt bowl</li>
+                            <li>Granola, nuts, berries, honey</li>
+                        </ul>
+                        <span class="calories">~500 cal</span>
+                        <span class="protein">25g protein</span>
+                    </div>
+
+                    <div class="success-box">
+                        <h4>DAILY TOTALS:</h4>
+                        <p><strong>Calories:</strong> ~4100</p>
+                        <p><strong>Protein:</strong> 210g</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>🌱 SAMPLE DAY 3 - LEGUME HEAVY (FISH BREAK)</h2>
+                    
+                    <div class="meal-section">
+                        <h5>BREAKFAST</h5>
+                        <ul>
+                            <li>Smoothie: 2 scoops whey</li>
+                            <li>2 cups milk</li>
+                            <li>1 cup oats</li>
+                            <li>2 tbsp peanut butter</li>
+                            <li>Banana, berries</li>
+                        </ul>
+                        <span class="calories">~900 cal</span>
+                        <span class="protein">45g protein</span>
+                    </div>
+
+                    <div class="meal-section">
+                        <h5>MORNING SNACK</h5>
+                        <ul>
+                            <li>Full-fat Greek yogurt (2 cups)</li>
+                            <li>Granola</li>
+                            <li>Berries</li>
+                        </ul>
+                        <span class="calories">~400 cal</span>
+                        <span class="protein">25g protein</span>
+                    </div>
+
+                    <div class="meal-section">
+                        <h5>LUNCH</h5>
+                        <ul>
+                            <li>Chipotle bowl:</li>
+                            <li>Double rice, black beans</li>
+                            <li>Fajita veggies, cheese, guac</li>
+                            <li>Chips</li>
+                        </ul>
+                        <span class="calories">~900 cal</span>
+                        <span class="protein">40g protein</span>
+                    </div>
+
+                    <div class="meal-section">
+                        <h5>AFTERNOON SNACK</h5>
+                        <ul>
+                            <li>Protein shake OR</li>
+                            <li>Hummus with pita + string cheese</li>
+                        </ul>
+                        <span class="calories">~500 cal</span>
+                        <span class="protein">30g protein</span>
+                    </div>
+
+                    <div class="meal-section">
+                        <h5>DINNER</h5>
+                        <ul>
+                            <li>Lentil curry with chickpeas</li>
+                            <li>2 cups basmati rice</li>
+                            <li>Naan bread with butter</li>
+                            <li>Roasted vegetables</li>
+                            <li>Full-fat yogurt on side</li>
+                        </ul>
+                        <span class="calories">~1000 cal</span>
+                        <span class="protein">50g protein</span>
+                    </div>
+
+                    <div class="meal-section">
+                        <h5>EVENING SNACK</h5>
+                        <ul>
+                            <li>Cottage cheese bowl</li>
+                            <li>Nuts, fruit</li>
+                        </ul>
+                        <span class="calories">~500 cal</span>
+                        <span class="protein">25g protein</span>
+                    </div>
+
+                    <div class="success-box">
+                        <h4>DAILY TOTALS:</h4>
+                        <p><strong>Calories:</strong> ~4200</p>
+                        <p><strong>Protein:</strong> 215g</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>🍽️ SCHOOL LUNCH STRATEGIES</h2>
+                    
+                    <div class="meal-plan">
+                        <h4>Cafeteria:</h4>
+                        <ul>
+                            <li>Fish sticks/sandwich if available</li>
+                            <li>Double up on sides (mac and cheese, beans, veggies)</li>
+                            <li>Get chocolate milk (extra calories + protein)</li>
+                            <li>Bring supplemental food in bag</li>
+                        </ul>
+                    </div>
+
+                    <div class="meal-plan">
+                        <h4>Pack Your Own:</h4>
+                        <ul>
+                            <li>2 tuna or salmon salad sandwiches</li>
+                            <li>String cheese (4-5)</li>
+                            <li>Mixed nuts</li>
+                            <li>2 pieces fruit</li>
+                            <li>Protein bar, Greek yogurt</li>
+                        </ul>
+                    </div>
+
+                    <div class="meal-plan">
+                        <h4>Off-Campus Quick Hits:</h4>
+                        <ul>
+                            <li><strong>Chipotle:</strong> Veggie bowl, double rice/beans, cheese, guac, chips</li>
+                            <li><strong>Panera:</strong> Mediterranean veggie sandwich + mac and cheese + smoothie</li>
+                            <li><strong>Poke Bowls:</strong> Perfect pescatarian option if available</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>🍴 EATING OUT OPTIONS</h2>
+                    
+                    <div class="meal-plan">
+                        <h4>Sushi/Poke:</h4>
+                        <p>Salmon, tuna (occasionally), veggie rolls. Edamame appetizer, miso soup.</p>
+                    </div>
+
+                    <div class="meal-plan">
+                        <h4>Mediterranean:</h4>
+                        <p>Grilled fish plates, legumes, rice, vegetables, hummus, falafel. Usually high quality.</p>
+                    </div>
+
+                    <div class="meal-plan">
+                        <h4>Asian:</h4>
+                        <p>Stir-fries with shrimp or tofu, curry with fish, pad Thai with shrimp, fried rice with egg.</p>
+                    </div>
+
+                    <div class="meal-plan">
+                        <h4>Mexican:</h4>
+                        <p>Fish tacos, bean burritos, cheese quesadillas, rice and bean bowls.</p>
+                    </div>
+
+                    <div class="meal-plan">
+                        <h4>Italian:</h4>
+                        <p>Pasta with clam sauce or shrimp, pasta with marinara, eggplant parmesan.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Supplements Section -->
+        <div id="supplements" class="section-content">
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h2>💊 TIER 1: ESSENTIALS</h2>
+                    
+                    <div class="supplement-card">
+                        <span class="tier-badge tier-1">TIER 1</span>
+                        <h4>Whey Protein Powder</h4>
+                        <p><strong>Why:</strong> Hitting 180-200g protein daily is HARD without it</p>
+                        <p><strong>Dosage:</strong> 2-3 scoops daily</p>
+                        <p><strong>Timing:</strong> Post-workout, between meals</p>
+                        <p class="price-tag">~$50/month</p>
+                    </div>
+
+                    <div class="supplement-card">
+                        <span class="tier-badge tier-1">TIER 1</span>
+                        <h4>Creatine Monohydrate</h4>
+                        <p><strong>Why:</strong> Pescatarians often see BIGGER gains (don't get it from diet)</p>
+                        <p><strong>Dosage:</strong> 5g daily</p>
+                        <p><strong>Timing:</strong> Doesn't matter, just daily</p>
+                        <p class="price-tag">~$3/month</p>
+                    </div>
+
+                    <div class="supplement-card">
+                        <span class="tier-badge tier-1">TIER 1</span>
+                        <h4>Vitamin D3</h4>
+                        <p><strong>Why:</strong> Most people deficient, immune system, bone health, testosterone</p>
+                        <p><strong>Dosage:</strong> 2000-5000 IU daily</p>
+                        <p class="price-tag">~$2/month</p>
+                    </div>
+
+                    <div class="supplement-card">
+                        <span class="tier-badge tier-1">TIER 1</span>
+                        <h4>Magnesium Glycinate</h4>
+                        <p><strong>Why:</strong> Recovery, sleep quality, muscle function</p>
+                        <p><strong>Dosage:</strong> 300-400mg before bed</p>
+                        <p class="price-tag">~$5/month</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>⚡ TIER 2: PESCATARIAN-SPECIFIC</h2>
+                    <p style="color: #f39c12; font-weight: bold; margin-bottom: 1rem;">Highly Recommended</p>
+                    
+                    <div class="supplement-card">
+                        <span class="tier-badge tier-2">TIER 2</span>
+                        <h4>Vitamin B12</h4>
+                        <p><strong>Why:</strong> Primarily in meat - fish has some but not as much</p>
+                        <p><strong>Dosage:</strong> 1000mcg daily or 2500mcg 2x/week</p>
+                        <p><strong>CRITICAL:</strong> B12 deficiency = fatigue, brain fog, weakness</p>
+                        <p class="price-tag">~$5/month</p>
+                    </div>
+
+                    <div class="supplement-card">
+                        <span class="tier-badge tier-2">TIER 2</span>
+                        <h4>Iron (if blood work shows deficiency)</h4>
+                        <p><strong>Why:</strong> Plant sources aren't absorbed as well, dairy inhibits absorption</p>
+                        <p><strong>Dosage:</strong> Only if tested and deficient</p>
+                        <p><strong>Type:</strong> Ferrous bisglycinate (gentle on stomach)</p>
+                        <p><strong>Take with:</strong> Vitamin C for absorption</p>
+                    </div>
+
+                    <div class="supplement-card">
+                        <span class="tier-badge tier-2">TIER 2</span>
+                        <h4>Zinc</h4>
+                        <p><strong>Why:</strong> Lower in fish/plant diet than meat diet</p>
+                        <p><strong>Dosage:</strong> 15-30mg daily</p>
+                        <p><strong>Note:</strong> Important for testosterone, immune function</p>
+                        <p class="price-tag">~$5/month</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>🔄 TIER 3: OPTIONAL</h2>
+                    
+                    <div class="supplement-card">
+                        <span class="tier-badge tier-3">TIER 3</span>
+                        <h4>Algae-Based Omega-3</h4>
+                        <p><strong>Why:</strong> DHA/EPA from algae instead of fish</p>
+                        <p><strong>When:</strong> Days you don't eat salmon, sardines, or mackerel</p>
+                        <p><strong>Note:</strong> You'll probably get enough from fish, but backup option</p>
+                    </div>
+
+                    <div class="supplement-card">
+                        <span class="tier-badge tier-3">TIER 3</span>
+                        <h4>Beta-Alanine</h4>
+                        <p><strong>Why:</strong> Normally from meat, improves high-intensity performance</p>
+                        <p><strong>Dosage:</strong> 3-5g daily</p>
+                        <p class="price-tag">~$3/month</p>
+                    </div>
+
+                    <div class="supplement-card">
+                        <span class="tier-badge tier-3">TIER 3</span>
+                        <h4>Electrolytes</h4>
+                        <p><strong>Why:</strong> Hydration, performance (Texas heat)</p>
+                        <p><strong>Same as meat-eaters</strong></p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>📊 WHAT YOU DON'T NEED</h2>
+                    
+                    <div class="warning-box">
+                        <h4>Skip These:</h4>
+                        <ul style="list-style: none;">
+                            <li>✗ Extra Omega-3 fish oil (you're eating fish - that's the source)</li>
+                            <li>✗ L-Carnitine (meat-specific)</li>
+                        </ul>
+                    </div>
+
+                    <div class="success-box">
+                        <h4>DO Watch These:</h4>
+                        <ul style="list-style: none;">
+                            <li>✓ B12: Get tested yearly, supplement if needed</li>
+                            <li>✓ Iron: If feeling tired - get blood work</li>
+                            <li>✓ Zinc: Consider supplementing</li>
+                            <li>✓ Protein powder: Non-negotiable for hitting targets</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Shopping Section -->
+        <div id="shopping" class="section-content">
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h2>🐟 FISH & SEAFOOD (~$40-60/week)</h2>
+                    
+                    <div class="shopping-list">
+                        <h4>Fresh/Frozen:</h4>
+                        <ul>
+                            <li>2-3 lbs wild salmon (Costco frozen)</li>
+                            <li>1 lb cod or halibut</li>
+                            <li>1 lb wild shrimp</li>
+                            <li>1 lb any other quality fish</li>
+                        </ul>
+                    </div>
+
+                    <div class="shopping-list">
+                        <h4>Canned:</h4>
+                        <ul>
+                            <li>5-7 cans sardines (Wild Planet, Season, King Oscar)</li>
+                            <li>3-5 cans skipjack tuna (Wild Planet, Safe Catch)</li>
+                            <li>2-3 cans mackerel</li>
+                            <li>Optional: Anchovies, canned salmon</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>🥛 DAIRY (~$30-40/week)</h2>
+                    
+                    <div class="shopping-list">
+                        <ul>
+                            <li>Whole milk (2 gallons)</li>
+                            <li>Kefir (2 containers)</li>
+                            <li>Greek yogurt full-fat (5-7 cups)</li>
+                            <li>Cottage cheese full-fat (2 containers)</li>
+                            <li>Cheese (cheddar, mozzarella - 2 lbs)</li>
+                            <li>Grass-fed butter (2 packages)</li>
+                            <li>String cheese (2 packs)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>🌾 CARBS (~$20/week)</h2>
+                    
+                    <div class="shopping-list">
+                        <ul>
+                            <li>Oatmeal (big container)</li>
+                            <li>Sourdough bread (2 loaves)</li>
+                            <li>White/brown rice (big bag)</li>
+                            <li>Sweet potatoes (5 lbs)</li>
+                            <li>Regular potatoes (5 lbs)</li>
+                            <li>Rice noodles (2 packages)</li>
+                            <li>Pasta (2 boxes)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>🌱 LEGUMES (~$10/week)</h2>
+                    
+                    <div class="shopping-list">
+                        <ul>
+                            <li>Lentils (dry or canned)</li>
+                            <li>Chickpeas (canned, 5-6 cans)</li>
+                            <li>Black beans (canned, 4-5 cans)</li>
+                            <li>Hummus (2 containers)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>🥑 HEALTHY FATS (~$25/week)</h2>
+                    
+                    <div class="shopping-list">
+                        <ul>
+                            <li>Avocados (6-8)</li>
+                            <li>Avocado oil (1 bottle)</li>
+                            <li>Olive oil EVOO (1 bottle)</li>
+                            <li>Natural peanut butter (2 jars)</li>
+                            <li>Natural almond butter (1 jar)</li>
+                            <li>Mixed nuts (big bag)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>🍎 FRUITS (~$20/week)</h2>
+                    
+                    <div class="shopping-list">
+                        <ul>
+                            <li>Bananas (dozen+)</li>
+                            <li>Apples (bag)</li>
+                            <li>Oranges (bag)</li>
+                            <li>Berries (3-4 containers)</li>
+                            <li>Any other fruit</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>🥦 VEGETABLES (~$20/week)</h2>
+                    
+                    <div class="shopping-list">
+                        <ul>
+                            <li>Spinach</li>
+                            <li>Broccoli (2 lbs)</li>
+                            <li>Mixed vegetables</li>
+                            <li>Frozen mixed vegetables (2 bags)</li>
+                            <li>Carrots</li>
+                            <li>Whatever else you'll eat</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>🥚 EGGS (if willing) (~$5/week)</h2>
+                    
+                    <div class="shopping-list">
+                        <ul>
+                            <li>3 dozen eggs</li>
+                            <li>Pasture-raised if budget allows</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>💊 PROTEIN & SUPPLEMENTS (~$15/week)</h2>
+                    
+                    <div class="shopping-list">
+                        <ul>
+                            <li>Whey protein (buy monthly)</li>
+                            <li>Creatine (buy monthly)</li>
+                            <li>B12, Vitamin D, Magnesium (buy monthly)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>💰 BUDGET BREAKDOWN</h2>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-box">
+                            <span class="stat-number">$200-250</span>
+                            <span class="stat-label">Weekly Total</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-number">$800-1000</span>
+                            <span class="stat-label">Monthly Total</span>
+                        </div>
+                    </div>
+
+                    <div class="tips-box">
+                        <h3>💰 Budget Hacks</h3>
+                        <ul>
+                            <li>Costco for bulk (milk, salmon, protein, nuts)</li>
+                            <li>Canned fish cheaper than fresh (often better quality)</li>
+                            <li>Frozen fish > "fresh" at regular stores</li>
+                            <li>Buy legumes dry and cook in bulk</li>
+                            <li>Store brands for dairy (just as good)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>🍳 MEAL PREP SUNDAY</h2>
+                    <p style="color: #27ae60; font-weight: bold; margin-bottom: 1rem;">2 Hours = Week of Success</p>
+                    
+                    <div class="meal-plan">
+                        <h4>Cook In Bulk:</h4>
+                        <ul>
+                            <li><strong>Fish:</strong> Bake 2-3 lbs salmon, grill 1-2 lbs other fish, keep canned ready</li>
+                            <li><strong>Carbs:</strong> Cook huge batch rice, bake sweet potatoes, cook lentils/beans</li>
+                            <li><strong>Snacks:</strong> Portion nuts into baggies, hard-boil eggs, pre-make protein shakes</li>
+                        </ul>
+                    </div>
+
+                    <div class="meal-plan">
+                        <h4>Assembly:</h4>
+                        <ul>
+                            <li>5 lunch containers: Fish + rice + vegetables</li>
+                            <li>5 snack bags: Nuts + fruit + protein bar</li>
+                            <li>Pre-portion Greek yogurt with granola/berries</li>
+                        </ul>
+                    </div>
+
+                    <div class="success-box">
+                        <h4>Results:</h4>
+                        <p><strong>Cost:</strong> ~$60-80 for week</p>
+                        <p><strong>Time Saved:</strong> 30+ minutes daily</p>
+                        <p><strong>Outcome:</strong> Hit targets guaranteed</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Final Message -->
+        <div class="tips-box">
+            <h3>🏉 THE PESCATARIAN PERFORMANCE ADVANTAGE</h3>
+            <ul>
+                <li><strong>Omega-3 Dominance:</strong> 2-3x higher intake than meat-eaters = better recovery</li>
+                <li><strong>Cleaner Protein:</strong> Fish digests easier, less gut inflammation</li>
+                <li><strong>Lower Inflammation:</strong> Recover faster than teammates eating burgers daily</li>
+                <li><strong>Cardiovascular Edge:</strong> Better lipid profile, better endurance</li>
+                <li><strong>Done Right:</strong> Match or exceed meat-eater performance</li>
+            </ul>
+        </div>
+
+        <div class="success-box">
+            <h3>📊 SUCCESS METRICS - ARE YOU ON TRACK?</h3>
+            <h4 style="color: #27ae60;">Signs You're Doing It Right:</h4>
+            <ul style="list-style: none;">
+                <li>✓ Gaining 0.5-1 lb per week steadily</li>
+                <li>✓ Strength increasing in gym</li>
+                <li>✓ Energy stays high throughout day</li>
+                <li>✓ Recovery feels good</li>
+                <li>✓ Not always exhausted</li>
+                <li>✓ Abs shouldn't completely disappear</li>
+            </ul>
+        </div>
+
+        <div class="warning-box">
+            <h3>⚠️ RED FLAGS:</h3>
+            <ul style="list-style: none;">
+                <li>✗ Losing weight (eat WAY more)</li>
+                <li>✗ Always exhausted (check B12, iron, total calories)</li>
+                <li>✗ Getting sick frequently (not enough protein/nutrients)</li>
+                <li>✗ Strength declining (not recovering, need more food)</li>
+                <li>✗ Digestive issues (might be lactose - try lactose-free dairy)</li>
+            </ul>
+        </div>
+
+        <div style="text-align: center; padding: 2rem; margin: 2rem 0; background: linear-gradient(135deg, rgba(74, 144, 226, 0.2) 0%, rgba(0, 0, 0, 0.6) 100%); border-radius: 15px; border: 2px solid rgba(74, 144, 226, 0.5);">
+            <h2 style="color: #4a90e2; margin-bottom: 1rem;">WELCOME TO LAKE TRAVIS RUGBY, GWIL</h2>
+            <p style="font-size: 1.2rem; color: #fff; margin-bottom: 1rem;">
+                You're a skinny Welsh kid who needs to put on weight to compete. That's the reality.
+            </p>
+            <p style="font-size: 1.1rem; color: #27ae60; font-weight: bold;">
+                This pescatarian diet can absolutely support weight gain and performance.
+            </p>
+            <p style="font-size: 1.1rem; color: #fff; margin-top: 1rem;">
+                You MUST eat enough. You MUST hit protein targets. You MUST meal prep.
+            </p>
+            <p style="font-size: 1.3rem; color: #4a90e2; font-weight: bold; margin-top: 1.5rem;">
+                Now go eat some fucking salmon. 🐟
+            </p>
+        </div>
+
+    </div>
+
+    <script>
+        function switchSection(section) {
+            // Hide all sections
+            document.querySelectorAll('.section-content').forEach(content => {
+                content.style.display = 'none';
+                content.classList.remove('active');
+            });
+            
+            // Remove active class from all buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected section
+            const targetSection = document.getElementById(section);
+            if (targetSection) {
+                targetSection.style.display = 'block';
+                targetSection.classList.add('active');
+            }
+            
+            // Add active class to clicked button
+            event.target.classList.add('active');
+        }
+
+        // Initialize with fish-quality section visible
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('fish-quality').style.display = 'block';
+        });
+    </script>
+</body>
+</html>
